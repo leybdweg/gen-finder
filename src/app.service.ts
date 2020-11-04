@@ -1,15 +1,20 @@
 import {Injectable, OnModuleInit} from '@nestjs/common';
 import * as fs from "fs";
 import {promisify} from "util";
-import Tree from "tree-data-structure";
+import * as TreeModel from "tree-model";
 
 @Injectable()
 export class AppService implements OnModuleInit {
     private readonly prefix = 'AAAAAAAAAAA'
     private readonly tree: any;
+    private rootNode: any;
+    private manualTree: {};
 
     constructor() {
-        this.tree = new Tree('root')
+        this.tree = new TreeModel()
+        this.manualTree = {}
+        this.manualTree[this.prefix] = {}
+        this.rootNode = this.tree.parse({char: this.prefix})
     }
 
     async onModuleInit(): Promise<any> {
@@ -18,30 +23,59 @@ export class AppService implements OnModuleInit {
             if (baseString[i] === 'A') {
                 let prefixLength = this.prefix.length;
                 let nextPrefixLength = this.prefix.length;
-                for(let j = i; j < (i + prefixLength); j++){
-                    if(baseString[j] === 'A' && prefixLength > 0){
-                        prefixLength--;
-                    }
-                    if(baseString[j - 1] === 'A' && baseString[j] === 'A' && prefixLength === 0){
+                let genFound = false;
+                let prefixFound = false;
+                let nexPrefixFound = true;
+                let prefixFinishedAt;
+                // let nextPrefixStartAt = 0;
+                // let gotToNextPrefix = false;
+                for (let j = i; j < (i + prefixLength); j++) {
+                    if (baseString[j] === 'A') {
                         nextPrefixLength--;
                     }
-                    if(nextPrefixLength === 0){
-                        // next prefix achieved, get out of loop
-                        break;
+                    if (nextPrefixLength === 0) {
+                        prefixFinishedAt = j;
+                        prefixFound = true;
                     }
-
-                    if(prefixLength === 0){
-                        // prefix already found, start adding to tree
+                }
+                if (prefixFound) {
+                    let k = prefixFinishedAt;
+                    // let lastNodeAdded = this.rootNode;
+                    let lastNodeAdded = this.rootNode;
+                    while (nexPrefixFound) {
+                        k++;
+                        const shouldStop = baseString.substr(k, prefixLength).split('').every( char => char === 'A') // TODO: consider thinking a more performance wise solution
+                        if(baseString[k-1] !== 'A' && shouldStop){ // it's considered a stop point if some none prefix was found in it
+                            nexPrefixFound = false;
+                        } else {
+                            let nodeChild = lastNodeAdded.children.find(child => child.char === baseString[k])
+                            if(!nodeChild){
+                                nodeChild = lastNodeAdded.addChild(this.tree.parse({char: baseString[k]}))
+                            }
+                            lastNodeAdded = nodeChild
+                        }
                     }
                 }
             }
         }
+        console.log('aaaaa\n')
+        console.log(JSON.stringify(this.rootNode.model))
+        console.log('aaaaa\n')
     }
 
-    addChildren(data, key) {
+    private addChildren(data, key) {
         if (data[key]) {
 
         }
+    }
+
+    private findStartAndEndOfGen(ix): number[] {
+        let genStart;
+        let genFinish;
+        for (ix; ix < (ix + this.prefix.length); ix++) {
+
+        }
+        return [genStart, genFinish]
     }
 
     getHello(): string {

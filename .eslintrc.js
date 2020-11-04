@@ -2,6 +2,7 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: 'tsconfig.json',
+    ecmaVersion: 2019,
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
@@ -13,8 +14,10 @@ module.exports = {
   ],
   root: true,
   env: {
+    commonjs: true,
+    es6: true,
     node: true,
-    jest: true,
+    jest: true
   },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
