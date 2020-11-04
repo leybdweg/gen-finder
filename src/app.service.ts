@@ -5,7 +5,7 @@ import * as TreeModel from "tree-model";
 
 @Injectable()
 export class AppService implements OnModuleInit {
-    private readonly prefix = 'AAAAAAAAAAA'
+    public readonly prefix = 'AAAAAAAAAAA'
     private readonly tree: any;
     private readonly rootNode: any;
 
@@ -15,7 +15,7 @@ export class AppService implements OnModuleInit {
     }
 
     async onModuleInit(): Promise<any> {
-        const baseString = (await promisify(fs.readFile)(`${__dirname}/../gen.txt`)).toString();
+        const baseString = await this.loadData();
         for (let i = 0; i < baseString.length; i++) {
             if (baseString[i] === 'A') {
                 let prefixLength = this.prefix.length;
@@ -46,7 +46,21 @@ export class AppService implements OnModuleInit {
         // console.log('aaaaa\n')
     }
 
-    getHello(): string {
-        return 'Hello World!';
+    getGen(gen: string): boolean {
+        let lastNodeChecked = this.rootNode;
+        for(let i = this.prefix.length; i < gen.length; i++){
+            const nodeFound = lastNodeChecked.children.find(child => child.model.char === gen[i])
+            if(nodeFound){
+                lastNodeChecked = nodeFound;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private async loadData():Promise<string> {
+        const baseString = await promisify(fs.readFile)(`${__dirname}/../gen.txt`);
+        return baseString.toString();
     }
 }
