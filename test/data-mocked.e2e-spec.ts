@@ -7,7 +7,7 @@ import {AppService} from "../src/app.service";
 describe('Different data scenario', () => {
   let app: INestApplication;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();

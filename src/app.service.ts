@@ -20,13 +20,13 @@ export class AppService implements OnModuleInit {
             if (baseString[i] === 'A') {
                 let prefixLength = this.prefix.length;
                 let nextPrefixStillNotFound = true;
-                const prefixFound = baseString.substr(i, prefixLength).split('').every( char => char === 'A') // TODO: consider thinking a more performance wise solution
+                const prefixFound = !baseString.substr(i, prefixLength).match(/[^A]/) // TODO: consider thinking a more performance wise solution
 
                 if (prefixFound) {
                     let k = i + prefixLength;
                     let lastNodeAdded = this.rootNode;
                     while (nextPrefixStillNotFound) {
-                        const shouldStop = baseString.substr(k, prefixLength).split('').every( char => char === 'A') // TODO: consider thinking a more performance wise solution
+                        const shouldStop = !baseString.substr(k, prefixLength).match(/[^A]/) // TODO: consider thinking a more performance wise solution
                         if(baseString[k-1] !== 'A' && shouldStop){ // it's considered a stop point if some none prefix was found in it
                             nextPrefixStillNotFound = false;
                         } else {
