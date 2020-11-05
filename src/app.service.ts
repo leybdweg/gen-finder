@@ -17,40 +17,28 @@ export class AppService implements OnModuleInit {
     async onModuleInit(): Promise<any> {
         const baseString = await this.loadData();
         for (let i = 0; i < baseString.length; i++) {
-            if (baseString[i] === 'A') {
-                let prefixLength = this.prefix.length;
+            if (baseString[i] === 'A' && this.isPrefix(baseString.substr(i, this.prefix.length))) {
                 let nextPrefixStillNotFound = true;
-                const prefixFound = !baseString.substr(i, prefixLength).match(/[^A]/) // TODO: consider thinking a more performance wise solution
+                let genAt = i + this.prefix.length;
+                let lastNodeAdded = this.rootNode;
 
-                if (prefixFound) {
-                    let k = i + prefixLength;
-                    let lastNodeAdded = this.rootNode;
-                    while (nextPrefixStillNotFound) {
-                        const shouldStop = !baseString.substr(k, prefixLength).match(/[^A]/) // TODO: consider thinking a more performance wise solution
-                        if(baseString[k-1] !== 'A' && shouldStop){ // it's considered a stop point if some none prefix was found in it
-                            nextPrefixStillNotFound = false;
-                        } else {
-                            let nodeChild = lastNodeAdded.children.find(child => child.model.char === baseString[k])
-                            if(!nodeChild){
-                                nodeChild = lastNodeAdded.addChild(this.tree.parse({char: baseString[k]}))
-                            }
-                            lastNodeAdded = nodeChild
-                        }
-                        k++;
+                while (nextPrefixStillNotFound && genAt <= baseString.length) {
+                    if (baseString[genAt - 1] !== 'A' && this.isPrefix(baseString.substr(genAt, this.prefix.length))) { // it's considered a stop point if some none prefix was found in it
+                        nextPrefixStillNotFound = false;
+                    } else {
+                        lastNodeAdded = lastNodeAdded.children.find(child => child.model.char === baseString[genAt]) ?? lastNodeAdded.addChild(this.tree.parse({char: baseString[genAt]}))
                     }
+                    genAt++;
                 }
             }
         }
-        // console.log('aaaaa\n')
-        // console.log(JSON.stringify(this.rootNode.model))
-        // console.log('aaaaa\n')
     }
 
     getGen(gen: string): boolean {
         let lastNodeChecked = this.rootNode;
-        for(let i = this.prefix.length; i < gen.length; i++){
+        for (let i = this.prefix.length; i < gen.length; i++) {
             const nodeFound = lastNodeChecked.children.find(child => child.model.char === gen[i])
-            if(nodeFound){
+            if (nodeFound) {
                 lastNodeChecked = nodeFound;
             } else {
                 return false;
@@ -59,7 +47,11 @@ export class AppService implements OnModuleInit {
         return true;
     }
 
-    private async loadData():Promise<string> {
+    private isPrefix(str: string): boolean {
+        return !str.match(/[^A]/);  // TODO: consider thinking a more performance wise solution
+    }
+
+    private async loadData(): Promise<string> {
         const baseString = await promisify(fs.readFile)(`${__dirname}/../gen.txt`);
         return baseString.toString();
     }
