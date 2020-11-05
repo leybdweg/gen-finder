@@ -16,5 +16,14 @@ gens found:
 ####  preprocessing can be heavy, endpoint must be fast
     - data structure chosen: tree
     
-## cases not handled:
-2 prefixes together
+#### cases not handled:
+    - prefix inside gen (since next prefix defines end of gen) 
+
+
+## HOW TO RUN:
+    - npm install
+    - npm run build
+    - npm run start
+
+## Tests included and passing.
+    - npm run test
